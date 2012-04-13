@@ -120,9 +120,13 @@ function hmct_swap_them( $args = array() ) {
 	if ( ! $args['from_tax'] || ! $args['to_tax'] || ! $args['from_term'] || ! $args['to_term'] )
 		return false;
 	
+
+	// get around exclude from search issue
+	$post_types = array_keys( get_post_types( ) );
+
 	$posts = get_posts( array( 
 	
-		'post_type' => 'any',
+		'post_type' => $post_types,
 		'tax_query' => array(
 			array(
 				'taxonomy' => $args['from_tax'],
@@ -131,8 +135,7 @@ function hmct_swap_them( $args = array() ) {
 			)
 		),
 		
-		'posts_per_page' => 0,
-		'nopaging' => true,
+		'posts_per_page' => -1,
 		'post_status' => 'all'
 	) );
 
@@ -175,9 +178,9 @@ add_action( 'load-tools_page_change_tax', function() {
 	if ( isset( $_POST['hmct-delete-origin'] ) )
 		$delete_origin = ( $_POST['hmct-delete-origin'] == "1"  ) ? true : false;
 	else
-		$delete_origin = false;		
+		$delete_origin = false;	
 
-	hmct_swap_them( array(  
+	$result = hmct_swap_them( array(  
 		
 		'from_tax' 		=> $_POST['hmct-from-taxonomies'],
 		'to_tax' 		=> $_POST['hmct-to-taxonomies'],
